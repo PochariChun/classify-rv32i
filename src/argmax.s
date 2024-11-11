@@ -43,6 +43,7 @@ loop_start:
     j loop_start
 
 loop_end:
+    addi t1, t1, -1
     mv a0, t1
     jr ra
 
