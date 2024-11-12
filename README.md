@@ -20,7 +20,7 @@ The `argmax` function finds the index of the first occurrence of the maximum val
 - **t1**: Holds the index of the first occurrence of the maximum value.
 - **t2**: Serves as a loop counter to traverse the array elements.
 
-### Key Changes
+### Operations
 
 1. **Loop Implementation**: A loop is added to scan each element in the array, comparing it to the current maximum value in `t0`. If a new maximum is found, `t0` and `t1` are updated.
 2. **Error Handling**: If the array length (`a1`) is less than 1, the function now terminates with an exit code of 36.
@@ -32,15 +32,13 @@ This update makes the function more robust by ensuring it only operates on non-e
 During testing with `venus.jar`, the output was off by one index:  
 ```shell
 Expected a0 to be 2 not: 3
-
+```
 
 # RELU Function Implementation
 
-## Overview
-
 This implementation provides a RELU (Rectified Linear Unit) operation for an integer array, setting each negative value to zero while preserving non-negative values. The function iterates through the array, applying this transformation element by element, which is particularly useful in neural network layers where non-linear activation functions are required.
 
-## Essential Operations
+## Operations
 
 - **Loop through array elements**: The function uses a loop to access each element in the array sequentially.
 - **Conditional Check**: A conditional check is performed on each element to determine if it is negative.
@@ -52,4 +50,23 @@ This implementation provides a RELU (Rectified Linear Unit) operation for an int
 
 ### Challenge 1: Conditional Value Setting without Additional Branches
 - **Solution**: A straightforward comparison (`bge t2, zero, loop_end`) allows bypassing unnecessary operations on non-negative elements. This keeps the function optimized by only storing zero for negative values.
+
+# Strided Dot Product Function
+
+This implementation of the dot product function calculates the sum of products between two arrays, each accessed with a specified stride. The function iterates through each element in the arrays, multiplies corresponding elements, and accumulates the result. This is particularly useful for scenarios with non-contiguous data where strides specify the skip distance between elements.
+
+## Operations
+
+- **Stride Calculation**: The function calculates strides based on the input parameters and uses them to access elements in non-contiguous locations within each array.
+- **Element-wise Multiplication and Accumulation**: Each iteration multiplies elements from the two arrays and adds the product to an accumulator.
+- **Loop and Pointer Adjustment**: The loop increments array pointers according to the calculated strides, ensuring that only the specified elements are accessed.
+
+## Challenges and Solutions
+
+### Challenge 1: Pointer Increment Based on Strides
+During testing with `test_dot_standard.s`, the output was off by one index:  
+```shell
+Expected a0 to be 285 not: 851982
+```
+- **Solution**: Used bitwise left shift (`slli`) to multiply stride values by 4, aligning with 32-bit integer access. This approach simplified pointer adjustment, ensuring correct navigation through non-contiguous data segments.
 

@@ -31,12 +31,29 @@ dot:
     blt a3, t0, error_terminate   
     blt a4, t0, error_terminate  
 
-    li t0, 0            
-    li t1, 0         
+    # t0 = result, t1 = counter, >= a2
+    li t0, 0     
+    li t1, 0 
+    
+    # calculate strides for pointers
+    slli t5, a3, 2  # t5 = a3 * 4
+    slli t6, a4, 2  # t6 = a4 * 4
 
 loop_start:
     bge t1, a2, loop_end
     # TODO: Add your own implementation
+    lw t2, 0(a0)
+    lw t3, 0(a1)
+    mul t4, t2, t3
+    add t0, t0, t4
+
+    # add strides to pointers
+    add a0, a0, t5
+    add a1, a1, t6
+
+    # increment counter
+    addi t1, t1, 1
+    j loop_start
 
 loop_end:
     mv a0, t0
