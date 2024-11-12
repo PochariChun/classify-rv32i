@@ -167,6 +167,8 @@ classify:
     lw t0, 0(s3)
     lw t1, 0(s8)
     # mul a0, t0, t1 # FIXME: Replace 'mul' with your own implementation
+    jal mult
+
     slli a0, a0, 2
     jal malloc 
     beq a0, x0, error_malloc
@@ -205,6 +207,7 @@ classify:
     lw t1, 0(s8)
     # mul a1, t0, t1 # length of h array and set it as second argument
     # FIXME: Replace 'mul' with your own implementation
+    jal mult
     
     jal relu
     
@@ -227,6 +230,8 @@ classify:
     lw t0, 0(s3)
     lw t1, 0(s6)
     # mul a0, t0, t1 # FIXME: Replace 'mul' with your own implementation
+    jal mult
+
     slli a0, a0, 2
     jal malloc 
     beq a0, x0, error_malloc
@@ -286,7 +291,9 @@ classify:
     mv a0, s10 # load o array into first arg
     lw t0, 0(s3)
     lw t1, 0(s6)
-    mul a1, t0, t1 # load length of array into second arg
+
+    jal mult
+    # mul a1, t0, t1 # load length of array into second arg
     # FIXME: Replace 'mul' with your own implementation
     
     jal argmax
@@ -384,3 +391,17 @@ error_args:
 error_malloc:
     li a0, 26
     j exit
+
+mult:
+    li a0, 0
+    li t2, 0
+loop:
+    andi t3, t1, 1
+    beq t3, zero, skip
+    sll t4, t0, t2
+    add a0, a0, t4
+skip:
+    addi t2, t2, 1
+    srli t1, t1, 1
+    beq t1, zero, loop
+    jr ra

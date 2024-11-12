@@ -24,15 +24,15 @@ The `argmax` function finds the index of the first occurrence of the maximum val
 
 1. **Loop Implementation**: A loop is added to scan each element in the array, comparing it to the current maximum value in `t0`. If a new maximum is found, `t0` and `t1` are updated.
 2. **Error Handling**: If the array length (`a1`) is less than 1, the function now terminates with an exit code of 36.
-3. **Offset Adjustment**: To correct the output index, `addi t1, t1, -1` was added to adjust for a 1-based index offset, fixing an issue where `t1` returned an incorrect index. 
 
 This update makes the function more robust by ensuring it only operates on non-empty arrays, correctly adjusts the index output, and efficiently identifies the maximum element’s index with a time complexity of O(n).
 
-**Example Issue and Fix:**
-During testing with `venus.jar`, the output was off by one index:  
+### Challenge 1: Conditional Value Setting without Additional Branches
+During testing with `test_classify_1_silent`, the output was off by one index:  
 ```shell
 Expected a0 to be 2 not: 3
 ```
+ - **Solution**: I use **Offset Adjustment** to correct the output index, `addi t1, t1, -1` was added to adjust for a 1-based index offset, fixing an issue where `t1` returned an incorrect index. 
 
 # RELU Function Implementation
 
@@ -69,4 +69,22 @@ During testing with `test_dot_standard.s`, the output was off by one index:
 Expected a0 to be 285 not: 851982
 ```
 - **Solution**: Used bitwise left shift (`slli`) to multiply stride values by 4, aligning with 32-bit integer access. This approach simplified pointer adjustment, ensuring correct navigation through non-contiguous data segments.
+
+# Classify Custom Multiplication Implementation
+
+This implementation introduces a custom multiplication function in the `classify` operation, replacing the default `mul` instruction. The custom `mult` function uses binary shifting and addition to perform integer multiplication, which avoids reliance on the built-in `mul` instruction.
+
+## Essential Operations
+
+- **Binary Decomposition**: The function iterates through each bit in the multiplier (`t1`). For each set bit, the multiplicand (`t0`) is shifted by the bit's position and added to the accumulator.
+- **Bitwise Shifting and Accumulation**: The multiplicand is left-shifted, and the multiplier is right-shifted through each iteration to access individual bits. When a bit is set, the shifted multiplicand is added to the result.
+- **Loop and Condition Check**: The loop increments a counter and checks each bit in the multiplier, stopping when all bits have been processed.
+
+## Challenges and Solutions
+
+### Challenge 1: Avoiding the 'mul' Instruction
+- **Solution**: Designed a loop that decomposes the multiplication into shifts and additions, following the principles of binary multiplication. This removed the dependency on the `mul` instruction.
+
+### Challenge 2: Efficient Bitwise Manipulation
+- **Solution**: Used bitwise `AND` to check bits in the multiplier and bitwise shifts (`sll` and `srli`) for bit manipulation. This approach ensures efficient processing while remaining assembly-compatible.
 

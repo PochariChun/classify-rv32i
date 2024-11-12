@@ -77,6 +77,7 @@ inner_loop_start:
 #   a4 (int)  is the stride of arr1 = for B, stride = len(rows) - 1
 # Returns:
 #   a0 (int)  is the dot product of arr0 and arr1
+
     beq s1, a5, inner_loop_end
 
     addi sp, sp, -24
@@ -114,8 +115,28 @@ inner_loop_start:
     addi s1, s1, 1
     j inner_loop_start
     
+# inner_loop_end:
+#     # TODO: Add your own implementation
+
 inner_loop_end:
-    # TODO: Add your own implementation
+    # Print newline
+    li a0 '\n'
+    jal print_char
+
+    addi s3 s3 1
+    j outer_loop_start
+
+outer_loop_end:
+    # Epilogue
+    lw s0 0(sp)
+    lw s1 4(sp)
+    lw s2 8(sp)
+    lw s3 12(sp)
+    lw s4 16(sp)
+    lw ra 20(sp)
+    addi sp sp 24
+
+    jr ra
 
 error:
     li a0, 38
