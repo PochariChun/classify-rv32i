@@ -34,3 +34,22 @@ During testing with `venus.jar`, the output was off by one index:
 Expected a0 to be 2 not: 3
 
 
+# RELU Function Implementation
+
+## Overview
+
+This implementation provides a RELU (Rectified Linear Unit) operation for an integer array, setting each negative value to zero while preserving non-negative values. The function iterates through the array, applying this transformation element by element, which is particularly useful in neural network layers where non-linear activation functions are required.
+
+## Essential Operations
+
+- **Loop through array elements**: The function uses a loop to access each element in the array sequentially.
+- **Conditional Check**: A conditional check is performed on each element to determine if it is negative.
+  - If an element is negative, it is set to zero.
+  - If it is non-negative, the element remains unchanged.
+- **Index and Pointer Adjustment**: The loop increments the array pointer and the element index for the next iteration.
+
+## Challenges and Solutions
+
+### Challenge 1: Conditional Value Setting without Additional Branches
+- **Solution**: A straightforward comparison (`bge t2, zero, loop_end`) allows bypassing unnecessary operations on non-negative elements. This keeps the function optimized by only storing zero for negative values.
+

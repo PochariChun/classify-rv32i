@@ -23,12 +23,21 @@
 #   Result: [ 0, 0, 3,  0, 5]
 # ==============================================================================
 relu:
-    li t0, 1             
-    blt a1, t0, error     
-    li t1, 0             
+    li t0, 1              
+    blt a1, t0, error      # if a1 < 1, jump to error
+    li t1, 0              # t1 = counter
 
 loop_start:
     # TODO: Add your own implementation
+    lw t2, 0(a0)
+    bge t2, zero, loop_end
+    sw zero, 0(a0)
+
+loop_end:
+    addi t1, t1, 1
+    addi a0, a0, 4
+    blt t1, a1, loop_start
+    jr ra
 
 error:
     li a0, 36          
