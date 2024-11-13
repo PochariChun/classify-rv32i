@@ -70,7 +70,7 @@ Expected a0 to be 285 not: 851982
 ```
 - **Solution**: Used bitwise left shift (`slli`) to multiply stride values by 4, aligning with 32-bit integer access. This approach simplified pointer adjustment, ensuring correct navigation through non-contiguous data segments.
 
-# Classify Custom Multiplication Implementation
+# Classify
 
 This implementation introduces a custom multiplication function in the `classify` operation, replacing the default `mul` instruction. The custom `mult` function uses binary shifting and addition to perform integer multiplication, which avoids reliance on the built-in `mul` instruction.
 
@@ -88,3 +88,46 @@ This implementation introduces a custom multiplication function in the `classify
 ### Challenge 2: Efficient Bitwise Manipulation
 - **Solution**: Used bitwise `AND` to check bits in the multiplier and bitwise shifts (`sll` and `srli`) for bit manipulation. This approach ensures efficient processing while remaining assembly-compatible.
 
+# Matrix Multiplication Implementation
+
+This implementation performs matrix multiplication, calculating the product of two input matrices and storing the result in an output matrix. It uses a combination of loops and the `dot` function for efficient element-wise computation.
+
+## Functionality
+
+- **Input Matrices**:
+  - `M0` (Matrix A): A matrix with dimensions `rows0 × cols0`.
+  - `M1` (Matrix B): A matrix with dimensions `rows1 × cols1`.
+
+- **Output Matrix**:
+  - `D` (Result): A matrix with dimensions `rows0 × cols1`.
+
+### Key Steps
+
+1. **Validation**: Ensures that input dimensions are positive and compatible for multiplication (`M0_cols = M1_rows`). Exits with error code 38 for invalid inputs.
+2. **Outer Loop**: Iterates through each row of Matrix A.
+3. **Inner Loop**: Iterates through each column of Matrix B.
+4. **Dot Product**: Calculates the dot product of a row from Matrix A and a column from Matrix B using the `dot` function.
+5. **Result Storage**: Stores the result of the dot product into the appropriate element in the output matrix.
+
+## Challenges and Solutions
+
+### Challenge 1: Stride-Based Memory Access
+- **Solution**: Used stride calculations to access next element of MatrixB elements in memory.
+
+### Challenge 2: Dimension Compatibility Validation
+- **Solution**: Included pre-checks for matrix dimensions before processing, ensuring only valid inputs proceed to the computation stage.
+
+## Usage
+
+The `matmul` function is suitable for general-purpose matrix multiplication, supporting cases where input matrices have non-square dimensions or require stride-based memory management.
+
+### Arguments
+
+1. **Matrix A**:
+   - Address: `a0`
+   - Rows: `a1`
+   - Columns: `a2`
+2. **Matrix B**:
+   - Address: `a3`
+   - Rows: `a4`
+   - Columns

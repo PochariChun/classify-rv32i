@@ -61,9 +61,9 @@ matmul:
     
 outer_loop_start:
     #s0 is going to be the loop counter for the rows in A
-    li s1, 0
-    mv s4, a3
-    blt s0, a1, inner_loop_start
+    li s1, 0 # inner loop counter
+    mv s4, a3 # Matrix B pointer always start from the first element 'a3'
+    blt s0, a1, inner_loop_start # outer loop conter < a1 (rows of A)
 
     j outer_loop_end
     
@@ -78,7 +78,7 @@ inner_loop_start:
 # Returns:
 #   a0 (int)  is the dot product of arr0 and arr1
 
-    beq s1, a5, inner_loop_end
+    beq s1, a5, inner_loop_end # branch to inner loop end if 'inner loop counter' = a5 (cols number of B)
 
     addi sp, sp, -24
     sw a0, 0(sp)
@@ -91,12 +91,13 @@ inner_loop_start:
     mv a0, s3 # setting pointer for matrix A into the correct argument value
     mv a1, s4 # setting pointer for Matrix B into the correct argument value
     mv a2, a2 # setting the number of elements to use to the columns of A
-    li a3, 1 # stride for matrix A
-    mv a4, a5 # stride for matrix B
-    
+    li a3, 1 # stride for matrix A: row elements in A's row
+    mv a4, a5 # stride for matrix B: rows elements in B's column
+
+    # Arow s0 (outer loop counter) x Bcol s1 (inner loop counter)
     jal dot
     
-    mv t0, a0 # storing result of the dot product into t0
+    mv t0, a0 # storing result of the dot product into 't0'
     
     lw a0, 0(sp)
     lw a1, 4(sp)
@@ -106,13 +107,13 @@ inner_loop_start:
     lw a5, 20(sp)
     addi sp, sp, 24
     
-    sw t0, 0(s2)
-    addi s2, s2, 4 # Incrememtning pointer for result matrix
+    sw t0, 0(s2) # store the dot result 'to'
+    addi s2, s2, 4 # Incrememtning pointer for result matrix, move to the next element in result matrix
     
     li t1, 4
-    add s4, s4, t1 # incrememtning the column on Matrix B
+    add s4, s4, t1 # Matrix B pointer++ == Bcol pointer +4
     
-    addi s1, s1, 1
+    addi s1, s1, 1 # inner loop counter++ == Bcol++
     j inner_loop_start
     
 # inner_loop_end:
@@ -120,10 +121,14 @@ inner_loop_start:
 
 inner_loop_end:
     # Print newline
-    li a0 '\n'
-    jal print_char
+    # li a0 '\n'
+    # jal print_char
+   
+    li t1, 4
+    mul t2, a2, t1 # t2 = a2 * 4
+    add s3, s3, t2 # Matrix A pointer += t2
 
-    addi s3 s3 1
+    addi s0, s0, 1 # outer loop counter++ == Arow++
     j outer_loop_start
 
 outer_loop_end:
