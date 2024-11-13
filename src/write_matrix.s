@@ -63,6 +63,8 @@ write_matrix:
 
     # mul s4, s2, s3   # s4 = total elements
     # FIXME: Replace 'mul' with your own implementation
+    jal mult
+
 
     # write matrix data to file
     mv a0, s0
@@ -113,3 +115,18 @@ error_exit:
     lw s4, 20(sp)
     addi sp, sp, 44
     j exit
+
+    # mul s4, s2, s3   # s4 = total elements
+    # FIXME: Replace 'mul' with your own implementation
+mult:
+    li s4, 0
+    li t1, 0
+loop:
+    andi t2, s3, 1
+    beq t2, zero, skip
+    sll t3, s2, t1
+    add s4, s4, t3
+skip:
+    addi t1, t1, 1
+    bne t1, t0, loop
+    jr ra

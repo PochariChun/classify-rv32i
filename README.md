@@ -176,3 +176,29 @@ The `mult` function calculates the product of two integers (`t1` and `t2`) using
 
 ### Challenge 1: Avoiding the `mul` Instruction
 - **Solution**: Designed the `mult` function using bitwise shifts and additions to emulate multiplication.
+
+
+# Binary Matrix File Writer (`write_matrix`)
+
+The `write_matrix` function writes an integer matrix to a binary file. The function formats the file with a header containing the matrix dimensions, followed by the matrix data in row-major order. This implementation incorporates a custom `mult` function to replace the `mul` instruction for environments lacking native multiplication support.
+
+### Key Steps
+1. **File Operations**:
+   - Opens the binary file for writing (`fopen`).
+   - Writes the header containing the number of rows and columns.
+   - Writes the matrix elements to the file in row-major order.
+   - Closes the file after writing.
+
+2. **Matrix Size Calculation**:
+   - Replaced the `mul` instruction with the `mult` function to calculate the total number of elements in the matrix (`rows × columns`).
+
+3. **Error Handling**:
+   - Exit codes for various errors:
+     - `27`: File access error (`fopen`).
+     - `28`: File closure error (`fclose`).
+     - `30`: File write error (`fwrite`).
+
+## `mult` Function
+
+This implementation aligning with the improvements made in `read_matrix`.
+
