@@ -116,10 +116,8 @@ inner_loop_start:
     addi s1, s1, 1 # inner loop counter++ == Bcol++
     j inner_loop_start
     
-# inner_loop_end:
-#     # TODO: Add your own implementation
-
 inner_loop_end:
+    # TODO: Add your own implementation
     # Print newline
     # li a0 '\n'
     # jal print_char

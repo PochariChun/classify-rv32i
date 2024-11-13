@@ -131,3 +131,48 @@ The `matmul` function is suitable for general-purpose matrix multiplication, sup
    - Address: `a3`
    - Rows: `a4`
    - Columns
+
+
+# Binary Matrix File Reader (`read_matrix`)
+
+The `read_matrix` function loads a matrix from a binary file into dynamically allocated memory. The matrix dimensions are read from the file's header, and the data is stored in row-major order. This function now incorporates a custom `mult` implementation to replace the `mul` instruction for environments where the `mul` operation is unavailable.
+
+### Key Operations
+1. **File Operations**:
+   - Open file (`fopen`) and handle errors for file access.
+   - Read the header to obtain matrix dimensions.
+   - Read the matrix data and validate the read operation.
+   - Close the file after loading.
+
+2. **Dynamic Memory Allocation**:
+   - Allocate memory for the matrix based on the calculated size.
+   - Handle memory allocation errors.
+
+3. **Matrix Dimension Multiplication**:
+   - Replaced the `mul` instruction with a custom `mult` function that performs binary multiplication using shifts and additions.
+
+4. **Error Handling**:
+   - Exit codes for various errors:
+     - `26`: Memory allocation failure.
+     - `27`: File access error.
+     - `28`: File closure error.
+     - `29`: Data read error.
+
+## `mult` Function
+
+### Functionality
+The `mult` function calculates the product of two integers (`t1` and `t2`) using binary decomposition. Each bit in the multiplier is checked, and corresponding shifts of the multiplicand are added to the result.
+
+### Algorithm
+1. Decompose the multiplier (`t2`) into bits.
+2. For each set bit, shift the multiplicand (`t1`) and add it to the result accumulator (`s1`).
+3. Stop when all bits have been processed.
+
+### Benefits
+- Eliminates the dependency on the `mul` instruction.
+- Ensures compatibility with environments lacking native multiplication support.
+
+## Challenges and Solutions
+
+### Challenge 1: Avoiding the `mul` Instruction
+- **Solution**: Designed the `mult` function using bitwise shifts and additions to emulate multiplication.

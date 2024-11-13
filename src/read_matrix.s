@@ -52,6 +52,7 @@ read_matrix:
 
     jal fopen
 
+
     li t0, -1
     beq a0, t0, fopen_error   # fopen didn't work
 
@@ -76,6 +77,8 @@ read_matrix:
 
     # mul s1, t1, t2   # s1 is number of elements
     # FIXME: Replace 'mul' with your own implementation
+
+    jal mult
 
     slli t3, s1, 2
     sw t3, 24(sp)    # size in bytes
@@ -143,3 +146,19 @@ error_exit:
     lw s4, 20(sp)
     addi sp, sp, 40
     j exit
+
+    # mul s1, t1, t2
+
+mult:
+    li s1, 0
+    li t3, 0
+loop:
+    andi t4, t2, 1
+    beq t4, zero, skip
+    sll t5, t1, t3
+    add s1, s1, t5
+skip:
+    addi t3, t3, 1
+    srli t2, t2, 1
+    bne t2, zero, loop
+    jr ra
