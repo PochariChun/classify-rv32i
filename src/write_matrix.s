@@ -63,8 +63,11 @@ write_matrix:
 
     # mul s4, s2, s3   # s4 = total elements
     # FIXME: Replace 'mul' with your own implementation
+    # Prologue
     jal mult
-
+    lw s2, 24(sp)
+    lw s3, 28(sp)
+    mv s4, t0
 
     # write matrix data to file
     mv a0, s0
@@ -116,17 +119,18 @@ error_exit:
     addi sp, sp, 44
     j exit
 
-    # mul s4, s2, s3   # s4 = total elements
-    # FIXME: Replace 'mul' with your own implementation
+# mul s4, s2, s3   # s4 = total elements
+# FIXME: Replace 'mul' with your own implementation
 mult:
-    li s4, 0
-    li t1, 0
+    li t0, 0 # result
+    li t1, 0 # counter
 loop:
     andi t2, s3, 1
     beq t2, zero, skip
     sll t3, s2, t1
-    add s4, s4, t3
+    add t0, t0, t3
 skip:
     addi t1, t1, 1
-    bne t1, t0, loop
+    srli s3, s3, 1
+    bne s3, zero, loop
     jr ra

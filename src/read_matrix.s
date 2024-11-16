@@ -77,8 +77,8 @@ read_matrix:
 
     # mul s1, t1, t2   # s1 is number of elements
     # FIXME: Replace 'mul' with your own implementation
-
     jal mult
+    mv s1, t0
 
     slli t3, s1, 2
     sw t3, 24(sp)    # size in bytes
@@ -147,16 +147,15 @@ error_exit:
     addi sp, sp, 40
     j exit
 
-    # mul s1, t1, t2
-
+# mul s1, t1, t2
 mult:
-    li s1, 0
-    li t3, 0
+    li t0, 0 # result
+    li t3, 0 # counter  
 loop:
     andi t4, t2, 1
     beq t4, zero, skip
     sll t5, t1, t3
-    add s1, s1, t5
+    add t0, t0, t5
 skip:
     addi t3, t3, 1
     srli t2, t2, 1

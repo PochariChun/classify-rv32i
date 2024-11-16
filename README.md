@@ -225,27 +225,6 @@ The `read_matrix` function loads a matrix from a binary file into dynamically al
      - `28`: File closure error.
      - `29`: Data read error.
 
-## `mult` Function
-
-### Functionality
-The `mult` function calculates the product of two integers (`t1` and `t2`) using binary decomposition. Each bit in the multiplier is checked, and corresponding shifts of the multiplicand are added to the result.
-
-### Algorithm
-1. Decompose the multiplier (`t2`) into bits.
-2. For each set bit, shift the multiplicand (`t1`) and add it to the result accumulator (`s1`).
-3. Stop when all bits have been processed.
-
-### Benefits
-- Eliminates the dependency on the `mul` instruction.
-- Ensures compatibility with environments lacking native multiplication support.
-
-## Challenges and Solutions
-
-### Challenge 1: Avoiding the `mul` Instruction
-- **Solution**: Designed the `mult` function using bitwise shifts and additions to emulate multiplication.
-
-
-
 
 
 
@@ -276,38 +255,48 @@ The `write_matrix` function writes an integer matrix to a binary file. The funct
 
 This implementation aligning with the improvements made in `read_matrix`.
 
-# Matrix Multiplication Implementation
 
-This implementation performs matrix multiplication, calculating the product of two input matrices and storing the result in an output matrix. It uses a combination of loops and the `dot` function for efficient element-wise computation.
+
+
+
+
+
+
+# Function: `mult` (Custom Multiplication Function)
+
+This implementation aligns with the improvements made in `read_matrix`, `write_matrix`, and `classify`.  
+The `mult` function provides a custom implementation of binary multiplication using bitwise operations and additions. This refactored version is parameter-free, relying on the calling function to set up the necessary registers (prologue) and restore them after usage (epilogue).
 
 ## Functionality
 
-- **Input Matrices**:
-  - `M0` (Matrix A): A matrix with dimensions `rows0 × cols0`.
-  - `M1` (Matrix B): A matrix with dimensions `rows1 × cols1`.
+### Key Operations
+1. **Binary Multiplication**:
+   - Decomposes the multiplier into bits and performs bitwise shifts and additions to calculate the product.
+2. **Prologue and Epilogue**:
+   - The calling function is responsible for saving and restoring necessary registers before and after calling `mult`.
 
-- **Output Matrix**:
-  - `D` (Result): A matrix with dimensions `rows0 × cols1`.
+### Usage Examples
 
-## Challenges and Solutions
-
-### Challenge 1: Stride-Based Memory Access
-- **Solution**: Used stride calculations to access next element of MatrixB elements in memory.
-
-### Challenge 2: Dimension Compatibility Validation
-- **Solution**: Included pre-checks for matrix dimensions before processing, ensuring only valid inputs proceed to the computation stage.
-
-## Usage
-
-The `matmul` function is suitable for general-purpose matrix multiplication, supporting cases where input matrices have non-square dimensions or require stride-based memory management.
-
-### Arguments
-
-1. **Matrix A**:
-   - Address: `a0`
-   - Rows: `a1`
-   - Columns: `a2`
-2. **Matrix B**:
-   - Address: `a3`
-   - Rows: `a4`
-   - Columns: `a5`
+#### In `classify.s`
+```assembly
+# Prologue: Prepare operands t0 (multiplicand) and t1 (multiplier)
+# mul a1, t0, t1 
+jal mult
+mv a1, t2
+```
+#### In `write_matrix.s`
+```
+# Prologue: Prepare operands s2 (multiplicand) and s3 (multiplier)
+jal mult
+# Epilogue: Restore registers and store the result
+lw s2, 24(sp)
+lw s3, 28(sp)
+mv s4, t0
+```
+#### In `read_matrix.s`
+```
+# Prologue: Prepare operands t1 (multiplicand) and t2 (multiplier)
+jal mult
+# Epilogue: Store the result in s1
+mv s1, t0
+```
