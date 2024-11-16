@@ -6,7 +6,7 @@ Update the top-level README.md file to document your work, explaining the functi
 
 
 
-# Function `abs` (Absolute Value)
+# Function: `abs` (Absolute Value)
 
 This function provides a way to convert an integer into its absolute (non-negative) value by directly modifying the value in memory through pointer dereferencing. 
 The function first checks if the integer is negative and, if so, negates it using `sub` instead of `neg` to ensure compatibility with the RV32I instruction set. The resulting non-negative value is stored back at the original memory address.
@@ -48,9 +48,6 @@ The original implementation contained the following issues:
 skip:
 ```
 
-
-
-
 ## Loop Logic
 
 ### Key Steps
@@ -67,7 +64,12 @@ skip:
    - Move to the next element and repeat the loop.
 
 
-# RELU Function Implementation
+
+
+
+
+
+# Function: `RELU`
 
 This implementation provides a RELU (Rectified Linear Unit) operation for an integer array, setting each negative value to zero while preserving non-negative values. The function iterates through the array, applying this transformation element by element, which is particularly useful in neural network layers where non-linear activation functions are required.
 
@@ -84,7 +86,13 @@ This implementation provides a RELU (Rectified Linear Unit) operation for an int
 ### Challenge 1: Conditional Value Setting without Additional Branches
 - **Solution**: A straightforward comparison (`bge t2, zero, loop_end`) allows bypassing unnecessary operations on non-negative elements. This keeps the function optimized by only storing zero for negative values.
 
-# Strided Dot Product Function
+
+
+
+
+
+
+# Function: Strided `Dot`
 
 This implementation of the dot product function calculates the sum of products between two arrays, each accessed with a specified stride. The function iterates through each element in the arrays, multiplies corresponding elements, and accumulates the result. This is particularly useful for scenarios with non-contiguous data where strides specify the skip distance between elements.
 
@@ -103,7 +111,12 @@ Expected a0 to be 285 not: 851982
 ```
 - **Solution**: Used bitwise left shift (`slli`) to multiply stride values by 4, aligning with 32-bit integer access. This approach simplified pointer adjustment, ensuring correct navigation through non-contiguous data segments.
 
-# Classify
+
+
+
+
+
+# Function: `Classify`
 
 This implementation introduces a custom multiplication function in the `classify` operation, replacing the default `mul` instruction. The custom `mult` function uses binary shifting and addition to perform integer multiplication, which avoids reliance on the built-in `mul` instruction.
 
@@ -121,52 +134,73 @@ This implementation introduces a custom multiplication function in the `classify
 ### Challenge 2: Efficient Bitwise Manipulation
 - **Solution**: Used bitwise `AND` to check bits in the multiplier and bitwise shifts (`sll` and `srli`) for bit manipulation. This approach ensures efficient processing while remaining assembly-compatible.
 
-# Matrix Multiplication Implementation
 
-This implementation performs matrix multiplication, calculating the product of two input matrices and storing the result in an output matrix. It uses a combination of loops and the `dot` function for efficient element-wise computation.
 
-## Functionality
+
+
+
+
+
+# Function: `matmul` (Matrix Multiplication)
+
+The `matmul` function performs matrix multiplication, calculating the product of two input matrices and storing the result in an output matrix. It uses a combination of loops and the `dot` function for efficient element-wise computation.
+
+
+## Key Features
 
 - **Input Matrices**:
-  - `M0` (Matrix A): A matrix with dimensions `rows0 × cols0`.
-  - `M1` (Matrix B): A matrix with dimensions `rows1 × cols1`.
-
+  - Matrix A (`M0`): Dimensions `rows0 × cols0`.
+  - Matrix B (`M1`): Dimensions `rows1 × cols1`.
 - **Output Matrix**:
-  - `D` (Result): A matrix with dimensions `rows0 × cols1`.
+  - Matrix C (`D`): Dimensions `rows0 × cols1`.
 
-### Key Steps
+### Validation and Operations
+1. **Validation**:
+   - Ensures positive dimensions for both matrices.
+   - Verifies multiplication compatibility (`cols0 == rows1`).
+   - Exits with error code 38 for invalid inputs.
 
-1. **Validation**: Ensures that input dimensions are positive and compatible for multiplication (`M0_cols = M1_rows`). Exits with error code 38 for invalid inputs.
-2. **Outer Loop**: Iterates through each row of Matrix A.
-3. **Inner Loop**: Iterates through each column of Matrix B.
-4. **Dot Product**: Calculates the dot product of a row from Matrix A and a column from Matrix B using the `dot` function.
-5. **Result Storage**: Stores the result of the dot product into the appropriate element in the output matrix.
+2. **Matrix Multiplication**:
+   - Iterates over rows of Matrix A and columns of Matrix B.
+   - Computes the dot product for corresponding row-column pairs using a nested loop structure.
+   - Stores the resulting values in the output matrix.
 
-## Challenges and Solutions
+## Problem and Solution
 
-### Challenge 1: Stride-Based Memory Access
-- **Solution**: Used stride calculations to access next element of MatrixB elements in memory.
+### Original Problem
+- **Issue**: The stack pointer (`sp`) was not correctly restored in the function's epilogue, leading to a mismatch error.
+- **Error Details**:
+  - Venus error: `Save register sp not correctly restored before return`.
+  - Expected `sp`: `0x7FFFFFDC`, Actual: `0x7FFFFFD8`.
+- **Cause**: The original epilogue failed to account for all saved registers, resulting in an off-by-4 error during stack restoration.
 
-### Challenge 2: Dimension Compatibility Validation
-- **Solution**: Included pre-checks for matrix dimensions before processing, ensuring only valid inputs proceed to the computation stage.
+### Solution Fix
+The epilogue ensures proper cleanup before returning from the function:
+- Restores saved registers (`ra`, `s0-s5`) from the stack.
+- Adjusts the stack pointer (`sp`) back to its original position.
 
 ## Usage
 
-The `matmul` function is suitable for general-purpose matrix multiplication, supporting cases where input matrices have non-square dimensions or require stride-based memory management.
+### Function Prototype
+```assembly
+matmul:
+    # Arguments:
+    #   a0: Address of Matrix A
+    #   a1: Number of rows in Matrix A
+    #   a2: Number of columns in Matrix A
+    #   a3: Address of Matrix B
+    #   a4: Number of rows in Matrix B
+    #   a5: Number of columns in Matrix B
+    #   a6: Address for storing Matrix C (result)
+```
 
-### Arguments
-
-1. **Matrix A**:
-   - Address: `a0`
-   - Rows: `a1`
-   - Columns: `a2`
-2. **Matrix B**:
-   - Address: `a3`
-   - Rows: `a4`
-   - Columns
 
 
-# Binary Matrix File Reader (`read_matrix`)
+
+
+
+
+# Function: `read_matrix` (Binary Matrix File Reader)
 
 The `read_matrix` function loads a matrix from a binary file into dynamically allocated memory. The matrix dimensions are read from the file's header, and the data is stored in row-major order. This function now incorporates a custom `mult` implementation to replace the `mul` instruction for environments where the `mul` operation is unavailable.
 
@@ -211,7 +245,14 @@ The `mult` function calculates the product of two integers (`t1` and `t2`) using
 - **Solution**: Designed the `mult` function using bitwise shifts and additions to emulate multiplication.
 
 
-# Binary Matrix File Writer (`write_matrix`)
+
+
+
+
+
+
+
+# Function: `write_matrix` (Binary Matrix File Writer)
 
 The `write_matrix` function writes an integer matrix to a binary file. The function formats the file with a header containing the matrix dimensions, followed by the matrix data in row-major order. This implementation incorporates a custom `mult` function to replace the `mul` instruction for environments lacking native multiplication support.
 
@@ -235,3 +276,38 @@ The `write_matrix` function writes an integer matrix to a binary file. The funct
 
 This implementation aligning with the improvements made in `read_matrix`.
 
+# Matrix Multiplication Implementation
+
+This implementation performs matrix multiplication, calculating the product of two input matrices and storing the result in an output matrix. It uses a combination of loops and the `dot` function for efficient element-wise computation.
+
+## Functionality
+
+- **Input Matrices**:
+  - `M0` (Matrix A): A matrix with dimensions `rows0 × cols0`.
+  - `M1` (Matrix B): A matrix with dimensions `rows1 × cols1`.
+
+- **Output Matrix**:
+  - `D` (Result): A matrix with dimensions `rows0 × cols1`.
+
+## Challenges and Solutions
+
+### Challenge 1: Stride-Based Memory Access
+- **Solution**: Used stride calculations to access next element of MatrixB elements in memory.
+
+### Challenge 2: Dimension Compatibility Validation
+- **Solution**: Included pre-checks for matrix dimensions before processing, ensuring only valid inputs proceed to the computation stage.
+
+## Usage
+
+The `matmul` function is suitable for general-purpose matrix multiplication, supporting cases where input matrices have non-square dimensions or require stride-based memory management.
+
+### Arguments
+
+1. **Matrix A**:
+   - Address: `a0`
+   - Rows: `a1`
+   - Columns: `a2`
+2. **Matrix B**:
+   - Address: `a3`
+   - Rows: `a4`
+   - Columns: `a5`
